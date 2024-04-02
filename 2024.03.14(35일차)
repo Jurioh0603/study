@@ -1,6 +1,0 @@
-서브쿼리(단일행, 다중행)
-joinquery를 subquery로 바꾸기 (scalar subquery)
-multi-subquery(다중서브쿼리)에서 CASE함수 사용하기
-inline-subquery, rowid, rownum
-exists 연산
-https://humble-doom-43e.notion.site/35-36beca4553754cafad7fe4faea45aeb4?pvs=4
