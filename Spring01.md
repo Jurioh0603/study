@@ -1,7 +1,7 @@
 ## 프로젝트 생성
 아래 주소에서 생성<br>
 <https://start.spring.io> <br>
-아래 JDK버전설정 참고
+아래 JDK버전설정 참고 <br>
 <https://study6-6.tistory.com/787>
 <br>
 
