@@ -5,7 +5,7 @@
 <https://study6-6.tistory.com/787>
 <br>
 
-## 간단한 예제
+## Welcome page 만들기
 ### HelloController 생성
 
 ```
@@ -26,17 +26,33 @@ public class HelloController {
 ```
 <br>
 
-### hello.html 템플릿
+### index.html 템플릿
 ```
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+</head>
+<body>
+Hello
+<a href="/hello">hello</a>
+</body>
+</html>
+```
+<br>
+
+### hello.html 템플릿
+```
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
     <title>Hello</title>
 </head>
 <body>
-    <h1>${data}</h1> <!-- Controller에서 주었던 addAttribute의 값으로 치환됨 -->
+Hello
+<p th:text="'안녕하세요. ' + ${data}" >안녕하세요. 손님</p>
 </body>
 </html>
 ```
