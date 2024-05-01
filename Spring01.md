@@ -66,3 +66,23 @@ Hello
 ### 참고
 * spring-boot-devtools 라이브러리를 추가하면, html 파일을 컴파일만 해주면 서버 재시작 없이 View 파일 변경이 가능합니다.
 * 인텔리제이에서 컴파일 방법: 메뉴 build -> Recompile
+
+<br>
+
+## 치환
+http://localhost:8081/hello-mvc?name=Spring!!
+<br>
+다음 주소를 입력하면 주소 뒤의 name=~~가 ${name}자리에 출력된다
+```
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<p th:text="'hello ' + ${name}" >hello! empty</p>
+</body>
+</html>
+```
+
