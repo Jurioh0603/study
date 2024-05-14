@@ -36,7 +36,8 @@
     public void testUpdateBoard() {
 	BoardVO boardVO = new BoardVO(0,"테스트작성자명","테스트용title","테스트용 content");
 	testMapper.updateBoard(boardVO);
-    } ```
+    }
+```
 
 
 6. **테스트 실행:**
