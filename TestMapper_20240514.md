@@ -28,8 +28,7 @@
 	List<BoardVO> list = testMapper.getBoard();
 	System.out.println(list.size());
 	System.out.println(list.toString());
-     }
-     ```
+     } ```
 
 
    - 필요한 경우 임시 데이터를 제공합니다. 예를 들어, 파라미터가 있는 메서드를 테스트할 때는 임시 데이터를 생성합니다.
