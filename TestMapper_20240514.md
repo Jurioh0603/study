@@ -27,9 +27,16 @@
 	List<BoardVO> list = testMapper.getBoard();
 	System.out.println(list.size());
 	System.out.println(list.toString());
-     }```
+     } ```
 
    - 필요한 경우 임시 데이터를 제공합니다. 예를 들어, 파라미터가 있는 메서드를 테스트할 때는 임시 데이터를 생성합니다.
+	 ```@Test
+	public void testUpdateBoard() {
+		BoardVO boardVO = new BoardVO(0,"테스트작성자명","테스트용title","테스트용 content");
+		testMapper.updateBoard(boardVO);
+	}
+ ```
+
 
 6. **테스트 실행:**
    - 테스트 클래스를 마우스 오른쪽 클릭하여 "Run As -> JUnit Test"를 선택하여 테스트를 실행합니다.
