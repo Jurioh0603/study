@@ -129,4 +129,28 @@
 ## 파라미터
   > xml문서에서 파라미터의 타입을 작성할때 파라미터가 한개이면 생략이 가능하다<br>
   > 타입명은 MyBatis가 지정한 alias로 입력할 수 있다(사이트 참고)
-  
+
+## 내가 지정한 alias
+- root-context에서 mybatis-config.xml를 빈으로 생성
+  ```
+   <property name="configLocation" value="classpath:/mybatis-config/mybatis-config.xml"/>
+  ```
+- 실제 mybatis-config.xml 문서에서 alias지정
+  ```
+   <configuration>
+	<!-- alias 직접 지정할 때 -->
+	<!-- 존재하지 않는 클래스를 입력하면 에러가 발생(미리 등록하지 않기) -->
+	<typeAliases>
+		<typeAlias alias="boardVO" type="com.mycom.board.vo.BoardVO"/>
+	</typeAliases>
+   </configuration>
+  ```
+
+- Test xml문서에 적용
+  ```
+   <update id="updateBoard2" parameterType="boardVO">
+		update board
+		set title=#{title}, content=#{content}
+		where no=3
+   </update>
+  ```
