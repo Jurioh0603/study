@@ -25,7 +25,8 @@
    - `@Test` 어노테이션을 사용하여 매퍼 메서드를 실행하는 테스트 메서드를 작성합니다.
   
      
- ```@Test
+ ```
+ @Test
      public void testGetBoard() {
 	List<BoardVO> list = testMapper.getBoard();
 	System.out.println(list.size());
@@ -35,7 +36,8 @@
 
    - 필요한 경우 임시 데이터를 제공합니다. 예를 들어, 파라미터가 있는 메서드를 테스트할 때는 임시 데이터를 생성합니다.
 
- ```@Test
+ ```
+ @Test
     public void testUpdateBoard() {
 	BoardVO boardVO = new BoardVO(0,"테스트작성자명","테스트용title","테스트용 content");
 	testMapper.updateBoard(boardVO);
@@ -92,7 +94,7 @@
   ```
 - 실행클래스
   ```
-   	@Test
+   @Test
 	public void testSelectBoard() {
 		ArrayList<HashMap<String,Object>> list = testMapper.selectBoard(5);
 		System.out.println("글번호 1부터 no번까지"+list);
