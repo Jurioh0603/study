@@ -1,3 +1,28 @@
+## Spring Tool Suite (STS) 설치
+
+1. STS 다운로드 페이지에서 sts.jar 파일을 다운로드합니다.
+2. 다운로드한 sts.jar 파일을 더블 클릭하여 실행합니다.
+3. 설치 위치를 선택한 후 설치를 진행합니다. (보통 기본값인 C:\Program Files\SpringToolSuite4에 설치됩니다)
+4. 설치가 완료되면 sts.exe 파일을 실행하여 Spring Tool Suite를 시작합니다.
+
+## Lombok 설치
+
+1. 먼저 Lombok JAR 파일을 다운로드합니다.
+2. 다운로드한 JAR 파일을 더블 클릭하여 실행합니다.
+3. Install 버튼을 클릭하여 설치를 진행합니다.
+4. 설치가 완료되면 sts.exe(Spring Boot 툴)을 선택하고 Install 버튼을 클릭합니다.
+5. 설치가 완료되면 sts.exe 폴더에 Lombok 파일이 생성됩니다.
+
+## Lombok의 역할
+
+1. `@Setter`: Setter 메서드를 자동으로 생성합니다.
+2. `@Getter`: Getter 메서드를 자동으로 생성합니다.
+3. `@NoArgsConstructor`: 매개변수가 없는 기본 생성자를 자동으로 생성합니다.
+4. `@AllArgsConstructor`: 모든 필드를 매개변수로 가지는 생성자를 자동으로 생성합니다.
+5. `@Data`: equals, hashCode, Getter, Setter, ToString 메서드를 모두 자동으로 생성합니다.
+6. `@Builder`: 빌더 패턴을 자동으로 생성합니다.
+7. `@ToString`: toString 메서드를 자동으로 생성합니다.
+
 ## 프로젝트 생성
 
 1. 자바 버전 17이상만 지원
@@ -11,6 +36,8 @@
    - 추가로 선택한 것: Lombok, MySQL Driver, Oracle Driver
 7. Finish
 <br>
+
+
 
 ## Spring Boot 구조
 
@@ -72,7 +99,13 @@
 > 프로젝트 우클릭 -> gradle -> refresh gradle
 <br>
 
-> problems에서 경고 표시 마우스 우클릭 ~~ 처리
+## problems 창에서 경고 표시 처리하기
+
+1. Eclipse에서 Problems 창을 엽니다. (주로 하단에 위치합니다)
+2. Problems 창에 표시된 경고 아이콘을 마우스 우클릭합니다.
+3. 나타나는 메뉴에서 해결하고자 하는 옵션을 선택합니다. (예: Quick Fix 또는 해당 리소스 열기)
+4. 선택한 옵션을 실행하여 경고를 해결합니다.
+<br>
 
 ## Spring Boot test
 
@@ -87,6 +120,27 @@
 2. 이 어노테이션을 사용하면 컨트롤러가 뷰 템플릿을 통해 HTML 페이지를 렌더링하는 대신, 직접 응답의 본문으로 데이터를 반환
 <br>
 
-**포트번호 에러**
-@Controller와 @GetMapping와 @ResponseBody을 통해 컨트롤러 생성 후 실행 -> 포트번호 충돌<br>
-application.properties에서 포트번호 수정'server.port=8091' -> 실행 -> 주소입력 화면 결과 확인
+> **포트번호 에러**
+> @Controller와 @GetMapping와 @ResponseBody을 통해 컨트롤러 생성 후 실행 -> 포트번호 충돌<br>
+> application.properties에서 포트번호 수정'server.port=8091' -> 실행 -> 주소입력 화면 결과 확인
+<br>
+
+## jsp 사용하기 위한 설정 (maven Repository 사이트)
+1. **Tomcat Embeded Jasper 빌드하기**
+   - 내장 되어있는 버전과 동일한 버전 다운 (10.1.20) -> gradle 중에서 아무거나 복사 build.gradle에 붙여넣기
+2. **jstl**
+   - jstl 중 가장 다운로드 수가 많은 버전을 선택하여 Tomcat Embeded Jasper와 동일한 방법으로 의존성을 추가
+3. **
+4. **폴더 생성**
+   - 스프링과 동일하게 src/main 밑에 webapp/WEB-INF/views 폴더 모두 생성
+5. jsp 페이지 생성
+6. application.properties 에 다음코드를 추가하여 jsp 파일을 읽어들일 수 있도록 경로를 지정
+   - spring.mvc.view.prefix=/WEB-INF/views<br>
+   - spring.mvc.view.suffix=.jsp
+<br>
+
+## 웹으로 Spring Boot 프로젝트 생성
+> 아래주소에서 프로그램으로 생성한것 처럼 동일하게 설정하고 생성할 수 있음
+<https://start.spring.io/>
+<br>
+
