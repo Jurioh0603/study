@@ -130,11 +130,12 @@
    - 내장 되어있는 버전과 동일한 버전 다운 (10.1.20) -> gradle 중에서 아무거나 복사 build.gradle에 붙여넣기
 2. **jstl**
    - jstl 중 가장 다운로드 수가 많은 버전을 선택하여 Tomcat Embeded Jasper와 동일한 방법으로 의존성을 추가
-3. **
-4. **폴더 생성**
+3. **gradle반영**
+   - 프로젝트 우클릭 -> gradle -> gradle refresh
+5. **폴더 생성**
    - 스프링과 동일하게 src/main 밑에 webapp/WEB-INF/views 폴더 모두 생성
-5. jsp 페이지 생성
-6. application.properties 에 다음코드를 추가하여 jsp 파일을 읽어들일 수 있도록 경로를 지정
+6. jsp 페이지 생성
+7. application.properties 에 다음코드를 추가하여 jsp 파일을 읽어들일 수 있도록 경로를 지정
    - spring.mvc.view.prefix=/WEB-INF/views<br>
    - spring.mvc.view.suffix=.jsp
 <br>
