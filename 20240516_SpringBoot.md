@@ -120,7 +120,7 @@
 2. 이 어노테이션을 사용하면 컨트롤러가 뷰 템플릿을 통해 HTML 페이지를 렌더링하는 대신, 직접 응답의 본문으로 데이터를 반환
 <br>
 
-> **포트번호 에러**
+> **포트번호 에러**<br>
 > @Controller와 @GetMapping와 @ResponseBody을 통해 컨트롤러 생성 후 실행 -> 포트번호 충돌<br>
 > application.properties에서 포트번호 수정'server.port=8091' -> 실행 -> 주소입력 화면 결과 확인
 <br>
@@ -134,8 +134,8 @@
    - 프로젝트 우클릭 -> gradle -> gradle refresh
 5. **폴더 생성**
    - 스프링과 동일하게 src/main 밑에 webapp/WEB-INF/views 폴더 모두 생성
-6. jsp 페이지 생성
-7. application.properties 에 다음코드를 추가하여 jsp 파일을 읽어들일 수 있도록 경로를 지정
+6. **jsp 페이지 생성**
+7. **application.properties 에 다음코드를 추가하여 jsp 파일을 읽어들일 수 있도록 경로를 지정**
    - spring.mvc.view.prefix=/WEB-INF/views<br>
    - spring.mvc.view.suffix=.jsp
 <br>
