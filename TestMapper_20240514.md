@@ -100,4 +100,33 @@
 		System.out.println("글번호 1부터 no번까지"+list);
 	}
   ```
-  > 결과 : 데이터 각 속성과 값을 키와 값의 형태로 HashMap에 저장하고 그 내용들을 지정한 행의 갯수만큼 가져올 수 잇음
+  > 결과 : 데이터 각 속성과 값을 키와 값의 형태로 HashMap에 저장하고 그 내용들을 지정한 행의 갯수만큼 가져올 수 있음
+
+3. **파라미터 여러개일 경우 예시**
+   - xml문서
+	```
+ 	 <select id="selectBoard2" resultType="java.util.HashMap" parameterType="int">
+	 	select * 
+	 	from board 
+	 	where no between #{sNo} and #{eNo}
+	 </select>
+	```
+- 인터페이스
+  ```
+   public ArrayList<HashMap<String, Object>> selectBoard2(@Param("sNo") int startNo, @Param("eNo") int endNo);//=> 키와 값의 쌍으로 이루어진 리스트
+	
+  ```
+- 실행클래스
+  ```
+   @Test
+	public void testSelectBoard2() {
+		ArrayList<HashMap<String,Object>> list = testMapper.selectBoard2(1,5);
+		System.out.println("글번호 " +(list.size()) +list);
+	}
+  ```
+  > 2번과 3번 차이 : 3번에는 검색하고자하는 시작번호와 끝번호를 두개의 파라미터로 값을 받아와서 처리한다.
+  <br>
+## 파라미터
+  > xml문서에서 파라미터의 타입을 작성할때 파라미터가 한개이면 생략이 가능하다
+  > 타입명은 MyBatis가 지정한 alias로 입력할 수 있다(사이트 참고)
+  > 
