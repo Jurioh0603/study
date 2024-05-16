@@ -47,23 +47,26 @@
 5. **테스트 실행:**
    - 테스트 클래스를 마우스 오른쪽 클릭하여 "Run As -> JUnit Test"를 선택하여 테스트를 실행합니다.
 
-> 이전에 실행한 test는 주석처리 해주어야 데이터가 중복으로 생성 또는 삭제되지 않음
+  > 이전에 실행한 test는 주석처리 해주어야 데이터가 중복으로 생성 또는 삭제되지 않음
 
 
 ## List, Map Test
 1. **HashMap 예시**
  - xml문서
-	```<select id="getBoard2" resultType="java.util.HashMap" parameterType="int">
-			select * 
-			from board
-			where no = #{no}
-		</select>
+	```
+	<select id="getBoard2" resultType="java.util.HashMap" parameterType="int">
+		select * 
+		from board
+		where no = #{no}
+	</select>
 	```
 - 인터페이스
-  ```public HashMap<String, Object> getBoard2(int no);//파라미터X, 리턴type:List<BoardVO>
+  ```
+   public HashMap<String, Object> getBoard2(int no);//파라미터X, 리턴type:List<BoardVO>
   ```
 - 실행클래스
-  ```@Test
+  ```
+   @Test
 	public void testGetBoard2() {
 		HashMap<String, Object> map = testMapper.getBoard2(4);
 		System.out.println(map.toString());
@@ -71,23 +74,26 @@
 		System.out.println(map.get("WRITERNAME"));//키로 값을 출력할 때 대문자 사용
 	}
   ```
-> 결과 : 데이터 각 속성과 값을 키와 값의 형태로 HashMap으로 가져올 수 있음
+  > 결과 : 데이터 각 속성과 값을 키와 값의 형태로 HashMap으로 가져올 수 있음
 
 2. **List<HashMap<지네릭,지네릭>> 예시**
 
     - xml문서
-	```<select id="selectBoard" resultType="map" parameterType="int">
+	```
+ 	 <select id="selectBoard" resultType="map" parameterType="int">
 	 	select * 
 	 	from board 
 	 	where no between 1 and #{no}
 	 </select>
 	```
 - 인터페이스
-  ```public ArrayList<HashMap<String, Object>> selectBoard(int no);//=> 키와 값의 쌍으로 이루어진 리스트
+  ```
+   public ArrayList<HashMap<String, Object>> selectBoard(int no);//=> 키와 값의 쌍으로 이루어진 리스트
   ```
 - 실행클래스
-  ```@Test
-	public void testGetBoard4() {
+  ```
+   	@Test
+	public void testSelectBoard() {
 		ArrayList<HashMap<String,Object>> list = testMapper.selectBoard(5);
 		System.out.println("글번호 1부터 no번까지"+list);
 	}
