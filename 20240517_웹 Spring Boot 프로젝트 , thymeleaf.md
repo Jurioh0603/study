@@ -195,6 +195,99 @@ html파일에 반드시 아래 코드 작성해야함
 	</table>
   ```
 
+**VO객체활용**
+- Controller
+```
+	//반복문연습
+	@GetMapping("/view/ex03")
+	public String ex03(Model model) {
+		//List<SampleVO>
+		List<SampleVO> voList = new ArrayList<SampleVO>();
+		voList.add(new SampleVO("김1","김별명1"));
+		voList.add(new SampleVO("김2","김별명2"));
+		voList.add(new SampleVO("김3","김별명3"));
+		model.addAttribute("voList", voList);
+		return "view/ex03";
+	}
+  ```
+- html
+ ```
+	*List&lt;SampleVO&gt;
+	voList = [[${voList}]]
+	<br/><br/>
+			<ul th:each="vo : ${voList}">
+				<li th:text="${vo.name}">name</li>
+				<li>[[${vo.nickName}]]</li>
+			</ul>
+  ```
+
+**반복문 안에 if문이 있을 때**
+- Controller
+```
+	//반복문연습
+	@GetMapping("/view/ex03")
+	public String ex03(Model model) {
+		List<SampleVO> voList = new ArrayList<SampleVO>();
+		voList.add(new SampleVO("김1","김별명1",10));
+		voList.add(new SampleVO("김2","김별명2",20));
+		voList.add(new SampleVO("김3","김별명3",31));
+		model.addAttribute("voList", voList);
+		return "view/ex03";
+	}
+  ```
+
+- html
+ ```
+	<ul th:each="vo : ${voList}" th:if="${vo.age%2==0}">
+		<li>
+			<div></div>[[${vo.name}]] / [[${vo.nickName}]] / [[${vo.age}]]
+		</li>
+	</ul>
+  ```
+
+**status(상태코드값)**
+ ```
+	<ul th:each="vo, status : ${voList}">
+		<li>
+			[[${vo.name}]] / [[${status}]]
+		</li>
+	</ul>
+  ```
+-결과 
+
+> size : 0부터 1씩증가
+> size : 데이터의 갯수, VO 객체 하나의 행에 있는 데이터 갯수
+> count : 1부터 1씩증가, 데이터를 조회할 때 활용할 수 있음 ex-3번 count부터 줄바꿈하기
+> current : 각 데이터 내용
+
+ ```
+	김1 / {index = 0, count = 1, size = 3, current = SampleVO(name=김1, nickName=김별명1, age=10)}
+	김2 / {index = 1, count = 2, size = 3, current = SampleVO(name=김2, nickName=김별명2, age=20)}
+	김3 / {index = 2, count = 3, size = 3, current = SampleVO(name=김3, nickName=김별명3, age=31)}
+  ```
+
+**div대신 block 사용해도 같은 결과**
+ ```
+	<th:block th:each="vo, status : ${voList}">
+		<li>
+			[[${vo.name}]] / [[${status}]]
+		</li>
+	</th:block>
+  ```
+
+**builder 메서드 체이닝 기법**
+> 객체의 메서드를 연속적으로 호출하는 방식
+
+- vo 객체에 Builder 어노테이션
+- Controller에 Builder를 이용해 객체를 생성하고 필드값을 설정
+
+ ```
+	//Builder 객체를 이용해서 Builder 객체생성 후 필드값 설정
+	SampleVO sampleVO5 = SampleVO.builder()
+			.name("김5").nickName("김별명").age(39).build();
+	voList.add(sampleVO5);
+  ```
+
 
 > 반드시 [[${안에 입력해야만 변수로 인식한다}]] 또는 태그내에서 "${안에 작성해야한다}"
 <br>
