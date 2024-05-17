@@ -337,6 +337,7 @@ html파일에 반드시 아래 코드 작성해야함
 <br>
 
 **위 결과를 받아서 처리하는 방법**
+1. 쿼리 파라미터 타입 : 변수를 경로로 사용
 - Controller
  ```
 	@GetMapping("/view/ex04_2/{category}/{no}")
@@ -350,12 +351,34 @@ html파일에 반드시 아래 코드 작성해야함
 	[[${category}]] / [[${no}]]
   ```
 
-- 결과
+- 요청주소 및 결과
  ```
 	http://localhost:8091/view/ex04_2/김1/40  => (view페이지) 김1 / 40
 	http://localhost:8091/view/ex04_2/김2/41  => (view페이지) 김2 / 41
   ```
 
+2. 쿼리스트링 타입 : thymleaf href 템플릿
+- Controller
+ ```
+	@GetMapping("/view/ex04_3")
+		public String ex04_3(@RequestParam("category") String cate
+					,@RequestParam("no") String no) {
+			return "view/ex04_3";
+		}
+  ```
+- html
+ ```
+	<ul>
+		<li th:each="vo : ${voList}"><!-- 동적으로 데이터 넘기기 -->
+			<a th:href="@{/view/ex04_3(name=${vo.name}, age=${vo.age})}">[[${vo.name}]] / [[${vo.age}]]</a><p/>
+		</li>
+	</ul>
+  ```
+
+- 요청주소
+ ```
+	http://localhost:8091/view/ex04_3?n=김1&a=40
+  ```
 
 > 반드시 [[${안에 입력해야만 변수로 인식한다}]] 또는 태그내에서 "${안에 작성해야한다}"
 <br>
