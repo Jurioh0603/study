@@ -288,6 +288,74 @@ html파일에 반드시 아래 코드 작성해야함
 	voList.add(sampleVO5);
   ```
 
+**주소 파라미터 값 받아오기 (주소 - th:href="@{주소}")**
+- Controller
+ ```
+	@GetMapping("/view/ex04_1/{category}/{no}")
+		public String ex04_1(@PathVariable("category") String cate
+							,@PathVariable("no") String no) {
+			System.out.println("파라미터 category =" + cate);
+			System.out.println("파라미터 no=" + no);
+			return "view/ex04_1";
+		}
+  ```
+- html
+ ```
+	문법 태그 th:href="@{경로}" /절대경로   ./../상대경로
+	<a th:href="/view/ex04_1/it/1">일반 a 요소(ex01.html응답문서)</a><p/>
+  ```
+- 결과
+ ```
+	파라미터 category =it
+	파라미터 no=1
+  ```
+
+**thymeleaf 이용해서 데이터 가져가기**
+- Controller
+ ```
+	@GetMapping("/view/ex04_2")
+		public String ex04_2() {
+			return "view/ex04_2";
+		}
+  ```
+- html
+ ```
+	<ul>
+		<li th:each="vo : ${voList}"><!-- 동적으로 데이터 넘기기 -->
+			<!-- <a th:href="@{/view/ex04_2/{변수명}/{변수명}"></a> -->
+			<a th:href="@{/view/ex04_2/{n}/{a}(n=${vo.name}, a=${vo.age})}">[[${vo.name}]] / [[${vo.age}]]</a><p/>
+		</li>
+	</ul>
+  ```
+- 주소 결과
+   ```
+	http://localhost:8091/view/ex04_2/김1/40
+   	http://localhost:8091/view/ex04_2/김2/41
+  ```
+
+> 주소에 값이 따라옴 값으로 다음페이지에서 처리해줄 수 있음
+<br>
+
+**위 결과를 받아서 처리하는 방법**
+- Controller
+ ```
+	@GetMapping("/view/ex04_2/{category}/{no}")
+		public String ex04_2(@PathVariable("category") String cate
+					,@PathVariable("no") String no) {
+			return "view/ex04_2";
+		}
+  ```
+- html
+ ```
+	[[${category}]] / [[${no}]]
+  ```
+
+- 결과
+ ```
+	http://localhost:8091/view/ex04_2/김1/40  => (view페이지) 김1 / 40
+	http://localhost:8091/view/ex04_2/김2/41  => (view페이지) 김2 / 41
+  ```
+
 
 > 반드시 [[${안에 입력해야만 변수로 인식한다}]] 또는 태그내에서 "${안에 작성해야한다}"
 <br>
