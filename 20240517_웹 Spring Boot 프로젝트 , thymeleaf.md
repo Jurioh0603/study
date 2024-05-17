@@ -148,7 +148,7 @@ html파일에 반드시 아래 코드 작성해야함
 	</table>
   ```
 
-**List<Map>**
+**Map 지네릭을 가진 List**
 - Controller
 ```
 	//반복문연습
@@ -198,5 +198,6 @@ html파일에 반드시 아래 코드 작성해야함
 
 > 반드시 [[${안에 입력해야만 변수로 인식한다}]] 또는 태그내에서 "${안에 작성해야한다}"
 <br>
+
 > 참고사이트
-> <https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html>
+> https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html
