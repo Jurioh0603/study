@@ -310,7 +310,7 @@ html파일에 반드시 아래 코드 작성해야함
 	파라미터 no=1
   ```
 
-**thymeleaf 이용해서 데이터 가져가기**
+**thymeleaf 이용해서 위에서 받아온 주소 파라미터 데이터 넘기기**
 - Controller
  ```
 	@GetMapping("/view/ex04_2")
