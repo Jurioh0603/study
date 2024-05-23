@@ -254,6 +254,12 @@ public class ChatRoom {
 }
  ```
 
+## 용어 정리
+**직렬화와 역직렬화**
+객체 데이터를 통신하기 쉬운 포멧(Byte,CSV,Json..) 형태로 만들어주는 작업을 직렬화라고 볼 수 있고, 역으로, 포멧(Byte,CSV,Json..) 형태에서 객체로 변환하는 과정을 역직렬화라고 할 수 있겠다.<br>
+주의할 점이 있는데, 역직렬화 시킬 클래스(여기서는 chat 클래스)에 JSON을 파싱한 결과를 전달할 생성자가 있어야 한다.<br>기본 생성자를 이용하거나 생성자에 Jackson 라이브러리의 @JsonCreator 어노테이션을 쓰는 등 다양한 방법이 있다.
+> ObjectMapper를 이용하여 JSON 직렬화와 역직렬화 참고 사이트
+> <https://velog.io/@zooneon/Java-ObjectMapper%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%98%EC%97%AC-JSON-%ED%8C%8C%EC%8B%B1%ED%95%98%EA%B8%B0>
 
 ## 참고사이트
 <https://velog.io/@ichubtou/Spring-Boot-Web-Socket-%EA%B0%84%EB%8B%A8%ED%95%9C-%EC%B1%84%ED%8C%85-%EA%B8%B0%EB%8A%A5-%EA%B5%AC%ED%98%84>
