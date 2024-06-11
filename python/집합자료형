@@ -1,0 +1,22 @@
+# 집합자료형(set) - 교재p102
+# 생성 - 문법> set()
+s1 = set( [1,2,3] )
+print( s1 )         #{1, 2, 3}
+print( type(s1) )   #<class 'set'>
+
+# 순서가 없다. 중복허용x #비교> list와 typle은 순차적,중복불가
+print( set("hello python") )   #{'o', ' ', 'e', 'y', 'n', 'l', 'h', 'p', 't'}
+
+# 교집합 - & 기호, intersection()
+s1 = set( [1,2,3,4,5,6,7] )
+s2 = set( [4,5,6,7, 11, 12, 13] )
+print( s1 & s2 )               #{4, 5, 6, 7}
+print( s1.intersection(s2) )   #{4, 5, 6, 7}
+
+#합집합 - | 기호, union()
+print( s1 | s2 )          #{1, 2, 3, 4, 5, 6, 7, 11, 12, 13}
+print( s1.union(s2) )     #{1, 2, 3, 4, 5, 6, 7, 11, 12, 13}
+
+#차집합 - - 기호, difference()
+print( s1 - s2 )            #{1, 2, 3}
+print( s1.difference(s2) )  #{1, 2, 3}
