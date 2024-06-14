@@ -58,6 +58,7 @@ html
 
 <input type="text" id="quantity" th:field="*{quantity}" th:class="${errors?.containsKey('quantity')} ? 'form-control 
 field-error' : 'form-control'" class="form-control" placeholder="수량을 입력하세요">
+<div class="field-error" th:if="${errors?.containsKey('quantity')}" th:text="${errors['quantity']}">수량 오류</div>
 ```
 
 > Safe Navigation Operator<br>
@@ -86,3 +87,56 @@ field-error' : 'form-control'" class="form-control" placeholder="수량을 입�
 <br>
 
 아래는 스프링이 제공하는 검증 방법들이다.
+
+## Binding Result1
+BindingResult 매개변수로 선언, model.addAttribute(errors)를 하지 않아도됨(각각의 조건문에서 binding함)
+문법 :  bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수입니다."));
+
+> FieldError
+> > objectName = @ModelAttribute이름
+> > field = 오류가 발생한 필드 이름
+> > defaultMessage = 오류 기본 메시지
+
+> ObjectError
+> > objectName = @ModelAttribute이름
+> > defaultMessage = 오류 기본 메시지
+controller
+```
+@PostMapping("/add")
+ public String addItemV1(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+  if (!StringUtils.hasText(item.getItemName())) {
+   bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수입니다."));
+  }
+ if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+   bindingResult.addError(new FieldError("item", "price", "가격은 1,000 ~ 1,000,000 까지 허용합니다."));
+ }
+ if (item.getQuantity() == null || item.getQuantity() >= 10000) {
+   bindingResult.addError(new FieldError("item", "quantity", "수량은 최대 9,999 까지 허용합니다."));
+ }
+ //특정 필드 예외가 아닌 전체 예외
+ if (item.getPrice() != null && item.getQuantity() != null) {
+   int resultPrice = item.getPrice() * item.getQuantity();
+   if (resultPrice < 10000) {
+     bindingResult.addError(new ObjectError("item", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice));
+   }
+ }
+ if (bindingResult.hasErrors()) {
+   log.info("errors={}", bindingResult);
+   return "validation/v2/addForm";
+ }
+ //성공 로직
+ Item savedItem = itemRepository.save(item);
+ redirectAttributes.addAttribute("itemId", savedItem.getId());
+ redirectAttributes.addAttribute("status", true);
+ return "redirect:/validation/v2/items/{itemId}";
+ }
+ ```
+html
+ ```
+ <div th:if="${#fields.hasGlobalErrors()}">
+  <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">글로벌 오류 메시지</p>
+ </div>
+<input type="text" id="quantity" th:field="*{quantity}" th:errorclass="field-error" class="form-control" placeholder="수량을 입력하세요">
+  <div class="field-error" th:errors="*{quantity}">수량 오류</div>
+ ```
+> 주의 BindingResult bindingResult 파라미터의 위치는  @ModelAttribute Item item 다음에 와야 함
