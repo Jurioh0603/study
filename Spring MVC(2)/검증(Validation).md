@@ -65,12 +65,16 @@ field-error' : 'form-control'" class="form-control" placeholder="수량을 입�
 > 등록 폼에 진입한 시점에는 error가 없다 따라서 errors.containsKey()를 호출하면 NullPointerException이 발생
 > 이때 문법중 errors?.는 error가  null일 때 NullPointerException대신 null을 반환하는 문법임
 > 이에 결과로 th:if에서 null은 실패로 처리되므로 오류메시지가 출력되지 않음
+
 <br>
+
 > 정리
 > 만약 검증 오류 발생 시 입력폼 다시보여줌
 > 검증 오류를 고객에게 안내해 다시입력할 수 있도록
 > 검증 오류가 발생해도 고객이 입력한 데이터가 유지됨
+
 <br>
+
 > 남은 문제점
 > 뷰 템플릿 중복이 많음
 > 타입오류처리가 안됨 - 숫자타입을 문자타입으로 설정하면 오류발생,
@@ -78,5 +82,7 @@ field-error' : 'form-control'" class="form-control" placeholder="수량을 입�
 > 타입 오류 발생시 고객이 입력한 문자 화면에 남겨야함, 그러나 숫자 타입에 문자 입력시 문자 바인딩이 불가능 해서 보관할 수 없음,
 > 결국 고객은 어떤 내용이 오류가 발생했는지 알기 어려움
 > 고객이 입력한 값도 어딘에가 별도로 관리되어야 함
+
 <br>
+
 아래는 스프링이 제공하는 검증 방법들이다.
