@@ -62,44 +62,44 @@ field-error' : 'form-control'" class="form-control" placeholder="수량을 입�
 ```
 
 > Safe Navigation Operator<br>
-> 만약 errors가 null이라면?<br>
-> 등록 폼에 진입한 시점에는 error가 없다 따라서 errors.containsKey()를 호출하면 NullPointerException이 발생<br>
-> 이때 문법중 errors?.는 error가  null일 때 NullPointerException대신 null을 반환하는 문법임<br>
-> 이에 결과로 th:if에서 null은 실패로 처리되므로 오류메시지가 출력되지 않음
+> > 만약 errors가 null이라면?<br>
+> > 등록 폼에 진입한 시점에는 error가 없다 따라서 errors.containsKey()를 호출하면 NullPointerException이 발생<br>
+> > 이때 문법중 errors?.는 error가  null일 때 NullPointerException대신 null을 반환하는 문법임<br>
+> > 이에 결과로 th:if에서 null은 실패로 처리되므로 오류메시지가 출력되지 않음
 
 <br>
 
 > 정리<br>
-> 만약 검증 오류 발생 시 입력폼 다시보여줌<br>
-> 검증 오류를 고객에게 안내해 다시입력할 수 있도록<br>
-> 검증 오류가 발생해도 고객이 입력한 데이터가 유지됨
+> > 만약 검증 오류 발생 시 입력폼 다시보여줌<br>
+> > 검증 오류를 고객에게 안내해 다시입력할 수 있도록<br>
+> > 검증 오류가 발생해도 고객이 입력한 데이터가 유지됨
 
 <br>
 
 > 남은 문제점<br>
-> 뷰 템플릿 중복이 많음<br>
-> 타입오류처리가 안됨 - 숫자타입을 문자타입으로 설정하면 오류발생,<br>
-> 이는 스프링 MVC에서 컨트롤러에 진입하기 전 예외 발생하기 때문에 컨트롤러 호출되지 않고 400예외 발생<br>
-> 타입 오류 발생시 고객이 입력한 문자 화면에 남겨야함, 그러나 숫자 타입에 문자 입력시 문자 바인딩이 불가능 해서 보관할 수 없음,<br>
-> 결국 고객은 어떤 내용이 오류가 발생했는지 알기 어려움<br>
-> 고객이 입력한 값도 어딘에가 별도로 관리되어야 함
+> > 뷰 템플릿 중복이 많음<br>
+> > 타입오류처리가 안됨 - 숫자타입을 문자타입으로 설정하면 오류발생,<br>
+> > 이는 스프링 MVC에서 컨트롤러에 진입하기 전 예외 발생하기 때문에 컨트롤러 호출되지 않고 400예외 발생<br>
+> > 타입 오류 발생시 고객이 입력한 문자 화면에 남겨야함, 그러나 숫자 타입에 문자 입력시 문자 바인딩이 불가능 해서 보관할 수 없음,<br>
+> > 결국 고객은 어떤 내용이 오류가 발생했는지 알기 어려움<br>
+> > 고객이 입력한 값도 어딘에가 별도로 관리되어야 함
 
 <br>
 
 아래는 스프링이 제공하는 검증 방법들이다.
 
 ## Binding Result1
-BindingResult 매개변수로 선언, model.addAttribute(errors)를 하지 않아도됨(각각의 조건문에서 binding함)
-문법 :  bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수입니다."));
+BindingResult 매개변수로 선언, model.addAttribute(errors)를 하지 않아도됨(각각의 조건문에서 binding함)<br>
+문법 :  bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수입니다."));<br>
 
-> FieldError
-> > objectName = @ModelAttribute이름
-> > field = 오류가 발생한 필드 이름
-> > defaultMessage = 오류 기본 메시지
+> FieldError<br>
+> > objectName = @ModelAttribute이름<br>
+> > field = 오류가 발생한 필드 이름<br>
+> > defaultMessage = 오류 기본 메시지<br>
 
-> ObjectError
-> > objectName = @ModelAttribute이름
-> > defaultMessage = 오류 기본 메시지
+> ObjectError<br>
+> > objectName = @ModelAttribute이름<br>
+> > defaultMessage = 오류 기본 메시지<br>
 controller
 ```
 @PostMapping("/add")
@@ -140,3 +140,25 @@ html
   <div class="field-error" th:errors="*{quantity}">수량 오류</div>
  ```
 > 주의 BindingResult bindingResult 파라미터의 위치는  @ModelAttribute Item item 다음에 와야 함
+
+
+## Binding Result2
+> binding 이 있으면 숫자 타입에 문자를 입력했을 때 400에러 발생하지 않고 폼으로 돌아오고 오류메시지 출력. 즉 컨트롤러 호출하게 해줌.
+
+<br>
+
+> 주의<br>
+> > binding result는 순서가 중요. 검증할 대상인 @ModelAttribute Item item 바로 다음에 와야한다.
+
+<br>
+
+> Binding Result는 Errors 인터페이스를 상속받고 있음<br>
+> Errors 인터페이스는 단순한 오류 저장과 조회 기능 제공<br>
+> Binding Result는 더 추가적인 기능을 제공<br>
+
+<br>
+
+그런데 Binding Result로 변경하고 나서는 사용자가 잘못된 값을 입력해서 에러가 발생했을 때 입력값이 사라지는 이슈가 발생함<br>
+이를 해결하기 위한 내용은 아래에 있음.<br>
+
+## FieldError, ObjectError
