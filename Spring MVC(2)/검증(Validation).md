@@ -162,3 +162,88 @@ html
 이를 해결하기 위한 내용은 아래에 있음.<br>
 
 ## FieldError, ObjectError
+### fieldError
+> objectName = 오류가 발생한 객체 이름<br>
+> field = 오류 필드<br>
+> rejectedValue = 사용자가 입력한 값(거절된 값)<br>
+> bindingFailure = 타입 오류 같은 바인딩 실패인지, 검증 실패인지 구분 값<br>
+> codes = 메시지 코드<br>
+> arguments = 메시지에서 사용자는 인자<br>
+> defaultMessage = 기본오류메시지<br>
+
+```
+ @PostMapping("/add")
+ public String addItemV2(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+   if (!StringUtils.hasText(item.getItemName())) {
+     bindingResult.addError(new FieldError("item", "itemName", item.getItemName(), false, null, null, "상품 이름은 필수입니다."));
+   }
+   if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+     bindingResult.addError(new FieldError("item", "price", item.getPrice(), false, null, null, "가격은 1,000 ~ 1,000,000 까지 허용합니다."));
+   }
+   if (item.getQuantity() == null || item.getQuantity() >= 10000) {
+     bindingResult.addError(new FieldError("item", "quantity", 
+     item.getQuantity(), false, null, null, "수량은 최대 9,999 까지 허용합니다."));
+   }
+   //특정 필드 예외가 아닌 전체 예외
+   if (item.getPrice() != null && item.getQuantity() != null) {
+     int resultPrice = item.getPrice() * item.getQuantity();
+     if (resultPrice < 10000) {
+       bindingResult.addError(new ObjectError("item", null, null, "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice));
+     }
+   }
+   if (bindingResult.hasErrors()) {
+     log.info("errors={}", bindingResult);
+     return "validation/v2/addForm";
+   }
+   //성공 로직
+   Item savedItem = itemRepository.save(item);
+   redirectAttributes.addAttribute("itemId", savedItem.getId());
+   redirectAttributes.addAttribute("status", true);
+   return "redirect:/validation/v2/items/{itemId}";
+ }
+```
+### 오류 발생시 사용자가 입력하는 값 유지 해주는 코드 부분
+item.getPrice()
+```
+ new FieldError("item", "price", item.getPrice(), false, null, null, "가격은 1,000 ~ 1,000,000 까지 허용합니다.")
+```
+
+### 타임리프 사용자의 입력값 유지
+th:field="*{price}"<br>
+타임리프의 th:field는 정상상황에서 모델 객체의 값을 사용하는데 오류가 발생하면 fieldError에서 보관한 값을 사용하여 값을 출력한다.<br>
+따라서 타입 오류로 바인딩 실패하면 fieldError를 생성하면서 사용자가 입력한 값을 넣어두고, 해당 오류를 BindingResult에 담아 컨트롤러 호출한다.<br>
+즉 바인딩 실패시에도 사용자의 오류 메시지를 정상 출력할 수 있다.<br>
+
+## 오류메시지 처리
+errors.properties 파일에서 에러메시지 입력<br>
+> ex) application.properties<br>
+> > spring.messages.basename=messages,errors<br>
+
+> ex) errors.properties<br>
+> >  required.item.itemName=상품 이름은 필수입니다.<br>
+> > range.item.price=가격은 {0} ~ {1} 까지 허용합니다<br>
+> >  max.item.quantity=수량은 최대 {0} 까지 허용합니다.<br>
+> > totalPriceMin=가격 * 수량의 합은 {0}원 이상이어야 합니다. 현재 값 = {1}<br>
+
+전달된 값으로 치환된다<br>
+코드 변경된 부분<br>
+```
+// range.item.price=가격은 {0} ~ {1} 까지 허용합니다.
+  if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+    bindingResult.addError(new FieldError("item", "price", item.getPrice(), false, new String[]{"range.item.price"},
+    new Object[]{1000, 1000000}, null));
+  }
+ 
+// max.item.quantity=수량은 최대 {0} 까지 허용합니다.
+ if (item.getQuantity() == null || item.getQuantity() > 10000) {
+  bindingResult.addError(new FieldError("item", "quantity", item.getQuantity(), false, new String[]{"max.item.quantity"},
+  new Object[]{9999}, null));
+ }
+
+// totalPriceMin=가격 * 수량의 합은 {0}원 이상이어야 합니다. 현재 값 = {1}
+if (item.getPrice() != null && item.getQuantity() != null) {
+ int resultPrice = item.getPrice() * item.getQuantity();
+ if (resultPrice < 10000) {
+   bindingResult.addError(new ObjectError("item", new String[]{"totalPriceMin"}, new Object[]{10000, resultPrice}, null));
+        
+```
