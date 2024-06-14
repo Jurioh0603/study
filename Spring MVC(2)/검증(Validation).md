@@ -225,7 +225,7 @@ errors.properties 파일에서 에러메시지 입력<br>
 > >  max.item.quantity=수량은 최대 {0} 까지 허용합니다.<br>
 > > totalPriceMin=가격 * 수량의 합은 {0}원 이상이어야 합니다. 현재 값 = {1}<br>
 
-전달된 값으로 치환된다<br>
+=> 전달된 값으로 치환된다<br>
 코드 변경된 부분<br>
 ```
 // range.item.price=가격은 {0} ~ {1} 까지 허용합니다.
@@ -247,3 +247,38 @@ if (item.getPrice() != null && item.getQuantity() != null) {
    bindingResult.addError(new ObjectError("item", new String[]{"totalPriceMin"}, new Object[]{10000, resultPrice}, null));
         
 ```
+
+## 오류 메시지 처리2
+오류코드를 좀 더 자동화 시켜보자<br>
+BindingResult는 검증해야할 객체인 target바로 다음에 오기 때문에 BindingResult는 이미 검증할 객체인 target을 알고 있다<br>
+<br>
+rejectValue()와, reject()를 사용하여 자동화 시켜볼 수 있다
+```
+if (!StringUtils.hasText(item.getItemName())) {
+  bindingResult.rejectValue("itemName", "required");
+}
+if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+  bindingResult.rejectValue("price", "range", new Object[]{1000, 1000000}, null);
+}
+if (item.getQuantity() == null || item.getQuantity() > 10000) {
+  bindingResult.rejectValue("quantity", "max", new Object[]{9999}, null);
+}
+//특정 필드 예외가 아닌 전체 예외
+if (item.getPrice() != null && item.getQuantity() != null) {
+  int resultPrice = item.getPrice() * item.getQuantity();
+  if (resultPrice < 10000) {
+     bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+  }
+}
+```
+
+> rejectValue()<br>
+> void rejectValue(@Nullable String field, String errorCode,<br>
+> @Nullable Object[] errorArgs, @Nullable String defaultMessage);<br>
+> > field = 오류필드명<br>
+> > errorCode = 오류코드<br>
+> > errorArgs = 오류 메시지에서 {0}을 치환하기 위한 값<br>
+> > defaultMessage = 오류메시지를 찾을 수 없을 때 사용하는 기본 메시지<br>
+> > bindingResult.rejectValue("price", "range", new Object[]{1000, 1000000}, null)<br>
+> > >  FieldError() 를 직접 다룰 때는 오류 코드를 range.item.price와 같이 모두 입력했지만<br>
+> > > rejectValue()를 사용하고부터는 간단하게 range만 입력했다 이에 대한 내용은 아래에서 자세히 설명한다.<br>
