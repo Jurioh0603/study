@@ -275,10 +275,146 @@ if (item.getPrice() != null && item.getQuantity() != null) {
 > rejectValue()<br>
 > void rejectValue(@Nullable String field, String errorCode,<br>
 > @Nullable Object[] errorArgs, @Nullable String defaultMessage);<br>
-> > field = 오류필드명<br>
+> > field = 오류필드명(html파일에서 지정)<br>
 > > errorCode = 오류코드<br>
 > > errorArgs = 오류 메시지에서 {0}을 치환하기 위한 값<br>
 > > defaultMessage = 오류메시지를 찾을 수 없을 때 사용하는 기본 메시지<br>
 > > bindingResult.rejectValue("price", "range", new Object[]{1000, 1000000}, null)<br>
 > > >  FieldError() 를 직접 다룰 때는 오류 코드를 range.item.price와 같이 모두 입력했지만<br>
 > > > rejectValue()를 사용하고부터는 간단하게 range만 입력했다 이에 대한 내용은 아래에서 자세히 설명한다.<br>
+
+
+## 오류 메시지 처리3
+위처럼 properties파일에 'required.item.itemName=상품 이름은 필수입니다.'라고 되어있다고 가정했을 때 <br>
+전체 이름을 입력하지 않고 required라고만 입력해도 오류메시지가 출력되는 이유는 properties 파일이 아래와 같다고 가정했을 때 <br>
+> 'required.item.itemName=상품 이름은 필수입니다.'<br>
+> 'required=필수입니다'<br>
+컨트롤러에서 아래와 같이 호출시<br>
+> 'bindingResult.rejectValue(~~,"required")'<br>
+reject는 가장먼저 'required.item.itemName'의 메시지를 찾고 만약 내용이 없다면 <br>
+'required'의 메시지를 찾는다.<br>
+즉 개발할 때 메시지의 내용을 더 세밀하게 바꾸어야 할 때 편리하게 메시지 내용을 변경할 수 있다.<br>
+
+## MessageCodesResolver에 대하여
+> properties 파일<br>
+> required=필수값입니다.<br>
+> required.java.lang.String=필수문자입니다.<br>
+> required.item.itemName=상품명은 필수항목입니다.<br>
+
+테스트 코드에서 실행<br>
+아래코드를 실행해보면 messageCodes 안에는 "required.item","required"가 <br>
+순서대로 들어있는 것을 확인할 수 있다.<br>
+> MessageCodesResolver codesResolver = new DefaultMessageCodesResolver();<br>
+> String[] messageCodes = codesResolver.resolveMessageCodes("required", "item");<br>
+> assertThat(messageCodes).containsExactly("required.item", "required");<br>
+
+아래코드를 실행해보면 테스트가 통과되는 것을 확인할 수 있다.<br>
+> String[] messageCodes = codesResolver.resolveMessageCodes("required", "item", "itemName", String.class);<br>
+> assertThat(messageCodes).containsExactly(<br>
+> "required.item.itemName",<br>
+> "required.itemName",<br>
+> "required.java.lang.String",<br>
+> "required"<br>
+> );
+
+**즉 세밀한 것부터 메시지를 배열에 담는다는 것을 알 수 있음!**
+> 순서는 세밀 - 타입 - 기본<br>
+> 타입이 붙었을 때 순서를 주의하자<br>
+> (참고)다음과 같은 코드로도 작성할 수 있음 ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required");<br>
+
+정리<br>
+> rejectValue()를 호출<br>
+> MessageCodeResolver를 사용해 검증 오류 코드로 메시지 코드들을 생성<br>
+> new FieldError()를 생성하면서 메시지 코드들 보관<br>
+> th:errors에서 메시지 코드들로 메시지를 순서대로 찾고 출력<br>
+
+## 스프링이 직접 만든 오류메시지 처리<br>
+숫자에 문자열 입력했을 때 스프링에서 생성한 장문의 에러 메세지의 로그를 보면 <br>
+typeMismatch.item.price, typeMismatch.price, typeMismatch.java.lang.Integer, typeMismatch라고 되어있음 <br>
+위 중에서 원하는 것을 골라 properties 파일에 작성하면 됨<br>
+> typeMismatch.item.price=숫자를 입력해주세요.<br>
+> typeMismatch=타입오류입니다.<br>
+
+## Validator 분리
+1. 검증 로직이 너무 길어 정상 값이 입력 되었을 때 실행되는 코드를 찾기 어려움<br>
+2. 위의 검증 로직을 따로 분리하는 컨트롤러를 생성<br>
+
+Validator 클래스 생성
+```
+@Component
+public class ItemValidator implements Validator {
+  @Override
+  public boolean supports(Class<?> clazz) {
+    return Item.class.isAssignableFrom(clazz);
+  }
+  @Override
+  public void validate(Object target, Errors errors) {
+    Item item = (Item) target;
+    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "itemName", "required");
+    if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+      errors.rejectValue("price", "range", new Object[]{1000, 1000000}, null);
+    }
+    if (item.getQuantity() == null || item.getQuantity() > 10000) {
+      errors.rejectValue("quantity", "max", new Object[]{9999}, null);
+    }
+    //특정 필드 예외가 아닌 전체 예외
+    if (item.getPrice() != null && item.getQuantity() != null) {
+      int resultPrice = item.getPrice() * item.getQuantity();
+      if (resultPrice < 10000) {
+      errors.reject("totalPriceMin", new Object[]{10000, resultPrice}, 
+     null);
+      }
+    }
+  }
+}
+```
+코드설명<br>
+> 이때 support메서드는 검증기를 지원하는 여부를 확인하는 메서드인데 이는 다음장에서 설명함<br>
+> validate(Object target, Errors errors) : 검증 대상 객체와 BindingResult임<br>
+> @Component를 통해 빈을 주입해 객체를 생성하지 않아도 호출가능하게 함<br>
+> 컨트롤러에 있던 코드들 복사해서 가져오고, bindingResult.rejectValue를 errors.rejectValue로 변경<br>
+> 이게 가능한 이유는 Errors 인터페이스가 BindingResult 인터페이스를 상속받고 있기 때문<br>
+
+컨트롤러에서 Validator클래스 호출하기
+```
+private final ItemValidator itemValidator;
+메서드(){
+  itemValidator.validate(item, bindingResult);
+}
+```
+다음과 같이 검증 대상 객체, bindingResult 순서대로 매개변수 입력<br>
+
+## Validator를 더 간단하게 사용하기
+컨트롤러에 아래 내용 추가
+```
+@InitBinder
+public void init(WebDataBinder dataBinder) {
+ log.info("init binder {}", dataBinder);
+ dataBinder.addValidators(itemValidator);
+}
+```
+위 검증기를 추가하면 해당 컨트롤러에서는 검증기를 자동으로 적용할 수 있다.<br>
+@InitBinder 해당 컨트롤러에만 영향을 준다. 글로벌 설정은 별도<br>
+
+컨트롤러에서 검증기를 수행할 객체 앞에 '@Validated' 어노테이션 추가<br>
+> public String addItemV6(@Validated @ModelAttribute Item item)<br>
+
+동작 방식 <br>
+> @Validated 는 검증기를 실행하라는 애노테이션<br>
+> 이 애노테이션이 붙으면 앞서 WebDataBinder 에 등록한 검증기(itemValidator)를 찾아서 실행<br>
+> 여러 검증기를 등록한다면 그 중에 어떤 검증기가 실행되어야 할지 구분이 필요<br>
+> 이때 supports() 가 사용, supports(Item.class) 호출되고 결과가 true이므로 ItemValidator 의 validate() 가 호출<br>
+
+#### 글로벌 설정 - 모든 컨트롤러에 적용
+실행클래스(application)에 아래 코드 추가(컨트롤러에 검증기 수행할 객체 앞에 @Vaildated는 꼭 붙이기)<br>
+```
+@Override
+ public Validator getValidator() {
+ return new ItemValidator();
+}
+```
+참고<br>
+> 글로벌 설정은 잘 사용되지 않는다.<br>
+> 검증시 @Validated @Valid 둘다 사용가능하다.<br>
+> 그러나 @Valid 사용하려면 의존관계 주입이 필요<br>
+> implementation 'org.springframework.boot:spring-boot-starter-validation<br>
