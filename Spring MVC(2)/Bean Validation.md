@@ -121,3 +121,26 @@ th:errorclass="field-error" 로 변경<br>
 ```
 
 ## Bean Validation 한계
+등록과 수정에서 조건이 다를 때 
+ex) 수정시에는 수량 9,999 이상의 값을 넣을 수 있다, id는 notnull이어야 한다. -> 등록이 작동되지 않음(id가 auto increament라서)
+다음장에서 해결해보자
+
+## Bean Validation groups
+검증을 다르게 적용하고 싶은 등록과 수정 group을 인터페이스로 생성
+dto의 조건 어노테이션에 아래와 같이 groups로 명시
+@NotNull(groups = UpdateCheck.class)
+여러개일 경우
+@NotBlank(groups = {SaveCheck.class, UpdateCheck.class})
+컨트롤러에 @Validated(SaveCheck.class) 와 같이 원하는 인터페이스명.class 작성
+
+**그러나 복잡도가 올라가는 문제로 잘 사용되지 않음**
+다음장에서 실무에서 주로 사용하는 쉬운 방법을 알아보자
+
+## form 전송 객체 분리
+기존방법 = html Form -> Item -> Controller -> Item -> Repository
+간단하지만 검증이 중복될 수 있고, groups를 사용해야해서 복잡도가 증가됨
+폼 객체 분리 = html Form-> ItemSaveForm -> Controller -> Item 생성 -> Repository
+복잡한 폼 데이터도 맞춤형으로 처리해서 전달할 수 있음, 검증 중복 안됨
+폼 데이터를 기반으로 Item객체 생성하는 변환 과정이 추가됨
+
+#### 코드
