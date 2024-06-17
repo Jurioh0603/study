@@ -121,26 +121,77 @@ th:errorclass="field-error" 로 변경<br>
 ```
 
 ## Bean Validation 한계
-등록과 수정에서 조건이 다를 때 
-ex) 수정시에는 수량 9,999 이상의 값을 넣을 수 있다, id는 notnull이어야 한다. -> 등록이 작동되지 않음(id가 auto increament라서)
-다음장에서 해결해보자
+등록과 수정에서 조건이 다를 때 <br>
+ex) 수정시에는 수량 9,999 이상의 값을 넣을 수 있다, id는 notnull이어야 한다. -> 등록이 작동되지 않음(id가 auto increament라서)<br>
+다음장에서 해결해보자<br>
 
 ## Bean Validation groups
-검증을 다르게 적용하고 싶은 등록과 수정 group을 인터페이스로 생성
-dto의 조건 어노테이션에 아래와 같이 groups로 명시
-@NotNull(groups = UpdateCheck.class)
-여러개일 경우
-@NotBlank(groups = {SaveCheck.class, UpdateCheck.class})
-컨트롤러에 @Validated(SaveCheck.class) 와 같이 원하는 인터페이스명.class 작성
+검증을 다르게 적용하고 싶은 등록과 수정 group을 인터페이스로 생성<br>
+dto의 조건 어노테이션에 아래와 같이 groups로 명시<br>
+@NotNull(groups = UpdateCheck.class)<br>
+여러개일 경우<br>
+@NotBlank(groups = {SaveCheck.class, UpdateCheck.class})<br>
+컨트롤러에 @Validated(SaveCheck.class) 와 같이 원하는 인터페이스명.class 작성<br>
 
 **그러나 복잡도가 올라가는 문제로 잘 사용되지 않음**
-다음장에서 실무에서 주로 사용하는 쉬운 방법을 알아보자
+다음장에서 실무에서 주로 사용하는 쉬운 방법을 알아보자<br>
 
 ## form 전송 객체 분리
-기존방법 = html Form -> Item -> Controller -> Item -> Repository
-간단하지만 검증이 중복될 수 있고, groups를 사용해야해서 복잡도가 증가됨
-폼 객체 분리 = html Form-> ItemSaveForm -> Controller -> Item 생성 -> Repository
-복잡한 폼 데이터도 맞춤형으로 처리해서 전달할 수 있음, 검증 중복 안됨
-폼 데이터를 기반으로 Item객체 생성하는 변환 과정이 추가됨
+기존방법 = html Form -> Item -> Controller -> Item -> Repository<br>
+간단하지만 검증이 중복될 수 있고, groups를 사용해야해서 복잡도가 증가됨<br>
+폼 객체 분리 = html Form-> ItemSaveForm -> Controller -> Item 생성 -> Repository<br>
+복잡한 폼 데이터도 맞춤형으로 처리해서 전달할 수 있음, 검증 중복 안됨<br>
+폼 데이터를 기반으로 Item객체 생성하는 변환 과정이 추가됨<br>
 
 #### 코드
+Item(dto) 어노테이션 삭제<br>
+ItemSaveForm, ItemUpdateForm dto 만들어 어노테이션 추가<br>
+컨트롤러의 매개변수로 오는 객체 수정 - @Validated 있는 메서드(검증 메서드)에 저장폼메서드에는 ItemSaveForm, 수정폼메서드에는 ItemUpdateForm으로 수정<br>
+주의<br>
+> '@ModelAttribute ItemUpadateForm form' 으로 작성시 '@ModelAttribute("itemSaveForm") ItemUpadateForm form'으로 인식<br>
+> 기존코드 수정하고 싶지 않으면 반드시 '@ModelAttribute("item") ItemUpadateForm form' 으로 작성<br>
+> 또는 ("item") 작성하지 않고 html의 전달변수명? 수정<br>
+
+기존 Item이 (ItemSaveForm으로 수정되어) 선언되어있지 않으므로 <br>
+아래 성공로직에서 Item객체 생성하면 됨<br>
+
+수정 코드도 동일하게 변경<br>
+
+**이를 통해 폼 객체분리 완료**
+
+## HTTP 메시지 컨버터
+@RequestBody =  HTTP Body의 데이터를 객체로 변환할 때 사용, 주로 API JSON 요청을 다룰 때 사용<br>
+@RestController = @RequestBody가 작성하지 않아도 적용됨<br>
+컨트롤러 코드
+```
+if (bindingResult.hasErrors()) {
+ log.info("검증 오류 발생 errors={}", bindingResult);
+ return bindingResult.getAllErrors();
+ }
+```
+즉 위 코드의 return bindingResult.getAllErrors(); 이 부분 결과가 자동으로 JSON 객체로 바뀜<br>
+
+1. 포스트맨에서 아래와 같이 입력해 성공 여부 확인<br>
+> POST http://localhost:8080/validation/api/items/add<br>
+> {"itemName":"hello", "price":1000, "quantity": 10}<br><br>
+
+2. 실패<br>
+만약 숫자 넣는 부분에 문자형태로 입력하면?<br>
+> {"itemName":"hello", "price":aaa, "quantity": 10}<br>
+> 로그를 보면 객체 생성에 실패함을 알 수 있음<br>
+> 객체를 만들지 못해 컨트롤러 자체가 호출되지 않음, 검증도 실행 안됨<br><br>
+
+3. 검증 오류<br>
+만약 검증 오류가 발생하도록 값을 넣으면?<br>
+> {"itemName":"hello", "price":1000, "quantity": 10000}<br>
+> 상단 컨트롤러 코드의 getAllErrors()가 JSON형태로 뿌려짐<br><br>
+
+> 실제 개발할 때는 이 객체들을 그대로 사용하지 말고,<br>
+> 필요한 데이터만 뽑아서 별도의 API 스펙을 정의하고 그에 맞는 객체를 만들어서 반환해야 한다.<br><br>
+
+@ModelAttribute vs @RequestBody<br>
+> @ModelAttribute 는 각각의 필드 단위로 세밀하게 적용해 특정 필드에 타입이 맞지 않는 오류가 발생해도 나머지 필드는 정상 처리할 수 있었다.<br>
+> HttpMessageConverter 는 @ModelAttribute 와 다르게 각각의 필드 단위로 적용되는 것이 아니라, 전체 객체 단위로 적용된다.<br>
+> @RequestBody 는 HttpMessageConverter 단계에서 JSON 데이터를 객체로 변경하지 못하면 <br>
+> 이후 단계 자체가 진행되지 않고 예외가 발생한다. 컨트롤러도 호출되지 않고, Validator도 적용할 수 없다.<br>
+> 이때 예외처리부분은 나중에 다룰 것이다.<br>
