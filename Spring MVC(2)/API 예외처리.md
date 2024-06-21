@@ -1,4 +1,5 @@
-![image](https://github.com/Jurioh0603/study/assets/148063470/e8de1756-883d-49c4-a2b0-9702ea41b3d2)## 시작
+## 시작
+![image](https://github.com/Jurioh0603/study/assets/148063470/e8de1756-883d-49c4-a2b0-9702ea41b3d2)<br>
 API 예외 처리 결과는 JSON 형태로 받아야 하지만 html 을 반환함<br>
 이를 해결하기 위해 여러가지 방법을 살펴볼 것<br>
 이 장에서는 서블릿 오류 방식 사용할 것<br>
