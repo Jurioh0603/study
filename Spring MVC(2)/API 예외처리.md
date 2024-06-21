@@ -251,3 +251,55 @@ WebConfig에 UserHandlerExceptionResolver 추가<br>
 다음장에서 확인하기<br>
 
 ## 스프링이 제공하는 ExceptionResolver1
+스프링 부트가 기본으로 제공하는 `ExceptionResolver`<br>
+`HandlerExceptionResolverComposite`에 다음 순서로 등록<br>
+1. `ExceptionHandlerExceptionResolver`<br>
+2. `ResponseStatusExceptionResolver`<br>
+3. `DefaultHandlerExceptionResolver` -> 우선 순위가 가장 낮음<br><br>
+
+`ResponseStatusExceptionResolver` 예외에 따라 HTTP 상태코드를 지정<br>
+1. `@ResponseStatus` 가 달려있는 예외<br><br>
+BadRequestException 클래스
+```
+@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "잘못된 요청 오류")
+public class BadRequestException extends RuntimeException {}
+```
+> 이때 `BAD_REQUEST` 말고도 다양한 에러가 상수로 정의되어있어 사용할 수 있음<br>
+> `ResponseStatusExceptionResolver` 코드를 확인해보면 이전에 직접 개발할 때처럼 ` response.sendError(statusCode, resolvedReason)`를 호출하는 것 확인할 수 있음<br>
+> `sendError(400)`을 호출했기 때문에 WAS에서 다시 오류 페이지 `(/error)`를 내부 요청함<br><br>
+
+ApiExceptionController - 추가
+```
+@GetMapping("/api/response-status-ex1")
+public String responseStatusEx1() {
+  throw new BadRequestException();
+}
+```
+
+메시지 기능 제공<br>
+BadRequestException 클래스 수정
+```
+@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "error.bad")
+public class BadRequestException extends RuntimeException {}
+```
+messages.properties 파일
+```
+error.bad=잘못된 요청 오류입니다.
+```
+
+결과는 properties 파일 내 메시지 출력됨<br><br>
+
+2. ResponseStatusException 예외<br><br>
+`@ResponseStatus`는 개발자가 직접 변경할 수 없는 예외 적용할 수 없음 ex)수정할 수 없는 라이브러리의 예외 코드 같은 곳<br>
+이때 ResponseStatusException 예외 사용하면 됨<br><br>
+
+ApiExceptionController - 추가
+```
+@GetMapping("/api/response-status-ex2")
+public String responseStatusEx2() {
+  throw new ResponseStatusException(HttpStatus.NOT_FOUND, "error.bad", new IllegalArgumentException());
+}
+```
+특정 에러 이름에 특정 에러를 지정할 수 있음<br>
+
+## 스프링이 제공하는 ExceptionResolver2
